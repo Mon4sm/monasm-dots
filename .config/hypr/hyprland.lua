@@ -17,12 +17,12 @@ local vol = "pamixer --get-volume"
 -----------------
 
 hl.on("hyprland.start", function () 
-hl.exec_cmd("bash -c eww open bar_widget && eww update get_vol=$(pamixer --get-volume) && ~/.config/eww/scripts/getvol.sh")
-hl.exec_cmd("bash -c ~/.config/eww/scripts/workspace.sh")
+hl.exec_cmd("eww open bar_widget && eww update get_vol=$(pamixer --get-volume) && ~/.config/eww/scripts/getvol.sh")
+hl.exec_cmd("~/.config/eww/scripts/workspace.sh")
 hl.exec_cmd("hyprpaper &")
 hl.exec_cmd("hypridle")
-hl.exec_cmd("sh ~/.config/hypr/scripts/text_animation/anitext.sh")
-hl.exec_cmd("sh ~/.config/hypr/scripts/weather/weather.sh")
+hl.exec_cmd("~/.config/hypr/scripts/text_animation/anitext.sh")
+hl.exec_cmd("~/.config/hypr/scripts/weather/weather.sh")
 --hl.exec_cmd(terminal)
 --hl.exec_cmd("nm-applet &")
 end)
@@ -213,12 +213,12 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 -- closeWindowBind:set_enabled(false)
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("grim -g $(slurp) ~/Pictures/Screenshots/screenshot.jpg"))
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("grim -g \"$(slurp)\" ~/Pictures/Screenshots/screenshot.jpg"))
 local closeWindowBind = hl.bind(mainMod .. " + E", hl.dsp.window.close())
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("kitty ranger"))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("sh -c hyprctl switchxkblayout at-translated-set-2-keyboard next"))
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("hyprctl switchxkblayout at-translated-set-2-keyboard next"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 
