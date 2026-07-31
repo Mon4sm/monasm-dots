@@ -9,7 +9,8 @@
 #define size(x) sizeof(x)/sizeof(x[0])
 
 char git_path[] = "https://github.com/Mon4sm/monasm-dots";
-char *dependency[] = {"awk","basename","bash","brightnessctl","cat","cp","curl","cut","date","echo","eww","fastfetch","fc-cache","git","grep","grim","head","hyprctl","hypridle","hyprland","hyprlock","jq","kitty","loginctl","ls","mkdir","mv","nmcli","nvim","pamixer","pidof","playerctl","ranger","rm","sh","sleep","slurp","socat","stdbuf","systemctl","uptime","wget","wpctl","xargs"};
+char *dependency[] = {"awk","basename","bash","brightnessctl","cat","cp","curl","cut","date","echo","eww","fastfetch","fc-cache","fc-list","git","grep","grim","head","hyprctl","hypridle","hyprland","hyprlock","hyprpaper","jq","kitty","loginctl","ls","mkdir","mv","nmcli","nvim","pamixer","pidof","playerctl","ranger","rm","sh","sleep","slurp","socat","stdbuf","systemctl","uptime","wget","wpctl","xargs"};
+char *font_dependency[] = {"JetBrainsMono Nerd Font"};
 char *exe_file[] = {"batest.sh","getvol.sh","menu.sh","wifictl.sh","batico.sh","current-wifi.sh","kb-delay.sh","music.sh","wifi-delay.sh","battery.sh","get_kb.sh","lock.sh","pmusic.sh","workspace.sh","calendar.sh","getnet.sh","menuctl.sh","usrctl.sh","wifi-disconnect.sh","coretemp.sh"};
 char *hypr_file[] = {"/delay-exec.sh","/battery.sh","/kb-switch.sh","/text_animation/anitext.sh","/weather/weather.sh"};
 char *hypr_name[] = {"delay-exec.sh","battery.sh","kb-switch.sh","anitext.sh","weather.sh"};
@@ -47,8 +48,23 @@ void dependencies(){
         }
         pclose(pipe);
     }
+    for(int i=0;i<size(font_dependency);i++){
+        char cmd[256];
+        FILE *pipe;
+        snprintf(cmd,sizeof(cmd),"fc-list | grep -qi \"%s\"",font_dependency[i]);
+        printf("Finding Dependency: %s\n",font_dependency[i]);
+        usleep(100000);
+        if(system(cmd)==0){
+            printf("    \033[92mFound: %s\033[0m\n",font_dependency[i]);
+        }
+        else{
+            sleep(1);
+            printf("    \033[31mMissing dependency: %s\033[0m\n",font_dependency[i]);
+            cnt++;
+        }
+    }
     if(cnt){
-        printf("\033[31mRequirements unfulfilled. Missing dependencies (%d/%d). Ending process...\033[0m\n",cnt,size(dependency));
+        printf("\033[31mRequirements unfulfilled. Missing dependencies (%d/%d). Ending process...\033[0m\n",cnt,size(dependency)+size(font_dependency));
         exit(EXIT_FAILURE);
     }
 }
