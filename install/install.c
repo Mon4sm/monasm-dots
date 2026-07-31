@@ -130,7 +130,7 @@ void install_configs(){
 
     char config_dir[512],backup_dir[512],cmd[2048];
     snprintf(config_dir,sizeof(config_dir),"%s/.config",home);
-    snprintf(backup_dir,sizeof(backup_dir),"%s/.monasm-backup-%ld",home,(long)time(NULL));
+    snprintf(backup_dir,sizeof(backup_dir),"%s/.rice-backup-%ld",home,(long)time(NULL));
     snprintf(cmd,sizeof(cmd),"mkdir -p \"%s\"",config_dir);
     system(cmd);
 
