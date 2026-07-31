@@ -41,6 +41,7 @@
 )
 
 (defvar trayrev false)
+(defvar username "")
 
 (defwidget tray []
     (box :orientation "h"
@@ -517,7 +518,7 @@
                              :space-evenly false
                              (box :class "username"
                                   :space-evenly false
-                                  (label :text "Monasm")
+                                  (label :text username)
                              )
                              (box :class "uptime"
                                   :space-evenly false
