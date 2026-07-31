@@ -17,7 +17,10 @@ local vol = "pamixer --get-volume"
 -----------------
 
 hl.on("hyprland.start", function () 
-hl.exec_cmd("eww open bar_widget && eww update get_vol=$(pamixer --get-volume) && ~/.config/eww/scripts/getvol.sh && ~/.config/hypr/scripts/set-eww-vars.sh")
+hl.exec_cmd("eww open bar_widget")
+hl.exec_cmd("eww update get_vol=$(pamixer --get-volume)")
+hl.exec_cmd("~/.config/eww/scripts/getvol.sh")
+hl.exec_cmd("~/.config/hypr/scripts/set-eww-vars.sh")
 hl.exec_cmd("~/.config/eww/scripts/workspace.sh")
 hl.exec_cmd("hyprpaper &")
 hl.exec_cmd("hypridle")
