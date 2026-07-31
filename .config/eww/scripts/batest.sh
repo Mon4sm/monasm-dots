@@ -1,11 +1,28 @@
 #!/bin/bash
 
+BAT=$(for b in /sys/class/power_supply/BAT*; do [ -e "$b/status" ] && echo "$b" && break; done)
+
+read_attr() {
+    if [ -e "$BAT/$1" ]; then
+        cat "$BAT/$1"
+    elif [ -e "$BAT/$2" ]; then
+        cat "$BAT/$2"
+    else
+        echo 0
+    fi
+}
+
 while true; do
-    CHARGE_NOW=$(cat /sys/class/power_supply/BAT0/charge_now)
-    CURRENT_NOW=$(cat /sys/class/power_supply/BAT0/current_now)
+    if [ -z "$BAT" ]; then
+        sleep 5
+        continue
+    fi
+
+    CHARGE_NOW=$(read_attr charge_now energy_now)
+    CURRENT_NOW=$(read_attr current_now power_now)
     CURRENT_NOW=${CURRENT_NOW#-}
-    CHARGE_FULL=$(cat /sys/class/power_supply/BAT0/charge_full)
-    STATUS=$(cat /sys/class/power_supply/BAT0/status)
+    CHARGE_FULL=$(read_attr charge_full energy_full)
+    STATUS=$(cat "$BAT/status")
 
     if [ "$CURRENT_NOW" -ne 0 ]; then
         if [[ "$STATUS" == "Discharging" ]]; then

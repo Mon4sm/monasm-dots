@@ -1,23 +1,18 @@
-/*
-
-This program is incomplete. Don't use it, it won't work lol.
- - Monasm 27/07/2025
-
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
+#include <dirent.h>
 #include <sys/stat.h>
 
 #define size(x) sizeof(x)/sizeof(x[0])
 
 char git_path[] = "https://github.com/Mon4sm/monasm-dots";
-char *dependency[] = {"awk","basename","bash","brightnessctl","cat","cp","curl","cut","date","echo","eww","fastfetch","git","grep","grim","head","hyprctl","hypridle","hyprland","hyprlock","jq","kitty","loginctl","ls","mkdir","mv","nmcli","nvim","pamixer","pidof","playerctl","ranger","rm","sh","sleep","slurp","socat","stdbuf","systemctl","uptime","wget","wpctl","xargs"};
-char *exe_file[] = {"batest.sh","getvol.sh","menu.sh","wifictl.sh","batico.sh","current-wifi.sh","kb-delay.sh","music.sh","wifi-delay.sh","battery.sh","get_kb.sh","lock.sh","pmusic.sh","workspace.sh","calendar.sh","getnet.sh","menuctl.sh","usrctl.sh"};
-char *hypr_file[] = {"/delay-exec.sh","/battery.sh","/text_animation/anitext.sh","/weather/weather.sh"};
-char *hypr_name[] = {"delay-exec.sh","battery.sh","anitext.sh","weather.sh"};
+char *dependency[] = {"awk","basename","bash","brightnessctl","cat","cp","curl","cut","date","echo","eww","fastfetch","fc-cache","git","grep","grim","head","hyprctl","hypridle","hyprland","hyprlock","jq","kitty","loginctl","ls","mkdir","mv","nmcli","nvim","pamixer","pidof","playerctl","ranger","rm","sh","sleep","slurp","socat","stdbuf","systemctl","uptime","wget","wpctl","xargs"};
+char *exe_file[] = {"batest.sh","getvol.sh","menu.sh","wifictl.sh","batico.sh","current-wifi.sh","kb-delay.sh","music.sh","wifi-delay.sh","battery.sh","get_kb.sh","lock.sh","pmusic.sh","workspace.sh","calendar.sh","getnet.sh","menuctl.sh","usrctl.sh","wifi-disconnect.sh","coretemp.sh"};
+char *hypr_file[] = {"/delay-exec.sh","/battery.sh","/kb-switch.sh","/text_animation/anitext.sh","/weather/weather.sh"};
+char *hypr_name[] = {"delay-exec.sh","battery.sh","kb-switch.sh","anitext.sh","weather.sh"};
 
 void boot(){
     printf("\033[93mStarting monasm-dots installation script");
@@ -41,7 +36,7 @@ void dependencies(){
         pipe = popen(cmd,"r");
         printf("Finding Dependency: %s\n",dependency[i]);
         usleep(100000);
-        if(fgets(path,sizeof(path),pipe)!=NULL){ 
+        if(fgets(path,sizeof(path),pipe)!=NULL){
             path[strcspn(path,"\n")]=0;
             printf("    \033[92mFound: %s at %s\033[0m\n",dependency[i],path);
         }
@@ -119,6 +114,82 @@ void privilege_esc(){
     }
 }
 
+void install_configs(){
+    char *home = getenv("HOME");
+    if(home==NULL){
+        printf("\033[31mCould not resolve $HOME. Ending process...\033[0m\n");
+        exit(EXIT_FAILURE);
+    }
+    printf("\n\033[93mInstalling configuration files...\033[0m\n");
+
+    DIR *d = opendir("./monasm-dots/.config");
+    if(d==NULL){
+        printf("\033[31mCould not open cloned .config directory. Ending process...\033[0m\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char config_dir[512],backup_dir[512],cmd[2048];
+    snprintf(config_dir,sizeof(config_dir),"%s/.config",home);
+    snprintf(backup_dir,sizeof(backup_dir),"%s/.monasm-backup-%ld",home,(long)time(NULL));
+    snprintf(cmd,sizeof(cmd),"mkdir -p \"%s\"",config_dir);
+    system(cmd);
+
+    int backed_up = 0;
+    struct dirent *e;
+    while((e=readdir(d))!=NULL){
+        if(strcmp(e->d_name,".")==0 || strcmp(e->d_name,"..")==0){
+            continue;
+        }
+        char target[1024];
+        snprintf(target,sizeof(target),"%s/.config/%s",home,e->d_name);
+        if(!access(target,F_OK)){
+            if(!backed_up){
+                snprintf(cmd,sizeof(cmd),"mkdir -p \"%s\"",backup_dir);
+                system(cmd);
+                backed_up = 1;
+                printf("\033[93mBacking up existing configs to %s\033[0m\n",backup_dir);
+            }
+            snprintf(cmd,sizeof(cmd),"mv \"%s\" \"%s/\"",target,backup_dir);
+            system(cmd);
+            printf("    \033[93mBacked up: %s\033[0m\n",e->d_name);
+        }
+        snprintf(cmd,sizeof(cmd),"cp -r \"./monasm-dots/.config/%s\" \"%s/.config/\"",e->d_name,home);
+        if(system(cmd)){
+            printf("    \033[31mFailed to install: %s\033[0m\n",e->d_name);
+        }
+        else{
+            printf("    \033[92mInstalled: %s\033[0m\n",e->d_name);
+        }
+    }
+    closedir(d);
+}
+
+void install_fonts(){
+    char *home = getenv("HOME");
+    printf("\n\033[93mInstalling fonts...\033[0m\n");
+
+    char font_dir[512],cmd[2048];
+    snprintf(font_dir,sizeof(font_dir),"%s/.local/share/fonts",home);
+    snprintf(cmd,sizeof(cmd),"mkdir -p \"%s\"",font_dir);
+    system(cmd);
+
+    snprintf(cmd,sizeof(cmd),"cp -r ./monasm-dots/font/. \"%s/\"",font_dir);
+    if(system(cmd)){
+        printf("    \033[31mFailed to copy fonts.\033[0m\n");
+    }
+    else{
+        printf("    \033[92mCopied bundled fonts to %s\033[0m\n",font_dir);
+    }
+    system("fc-cache -f >/dev/null 2>&1");
+    printf("    \033[92mRefreshed font cache.\033[0m\n");
+    printf("\033[93m    Note: this rice also uses \"JetBrainsMono Nerd Font\", which is not bundled.\n    Install it with: sudo pacman -S ttf-jetbrains-mono-nerd\033[0m\n");
+}
+
+void finish(){
+    printf("\n\033[92mmonasm-dots installed successfully!\033[0m\n");
+    printf("\033[93mLog out and back into Hyprland, or run 'hyprctl reload', to apply the new configuration.\033[0m\n");
+}
+
 int main(){
     setenv("PATH","/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/sbin:/usr/sbin",1);
     boot();
@@ -126,5 +197,7 @@ int main(){
     clone();
     warning();
     privilege_esc();
+    install_configs();
+    install_fonts();
+    finish();
 }
-

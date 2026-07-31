@@ -1,3 +1,3 @@
 #!/bin/bash
 
-hyprctl switchxkblayout at-translated-set-2-keyboard 0 && hyprlock
+~/.config/hypr/scripts/kb-switch.sh 0 && hyprlock
