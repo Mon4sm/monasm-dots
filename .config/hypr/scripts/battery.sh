@@ -1,8 +1,12 @@
 #!/bin/bash
 
-battery_percentage=$(cat /sys/class/power_supply/BAT0/capacity)
+BAT=$(for b in /sys/class/power_supply/BAT*; do [ -e "$b/capacity" ] && echo "$b" && break; done)
 
-battery_status=$(cat /sys/class/power_supply/BAT0/status)
+[ -z "$BAT" ] && exit 0
+
+battery_percentage=$(cat "$BAT/capacity")
+
+battery_status=$(cat "$BAT/status")
 
 battery_icons=("󰂃" "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰁹" "󰁹")
 

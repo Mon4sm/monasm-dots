@@ -2,8 +2,8 @@
 --- MONITORS ---
 ----------------
 
-hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "1", })
-no_update_news = "true"
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto", })
+hl.config({ ecosystem = { no_update_news = true } })
 
 -------------------
 --- MY PROGRAMS ---
@@ -17,7 +17,10 @@ local vol = "pamixer --get-volume"
 -----------------
 
 hl.on("hyprland.start", function () 
-hl.exec_cmd("eww open bar_widget && eww update get_vol=$(pamixer --get-volume) && ~/.config/eww/scripts/getvol.sh")
+hl.exec_cmd("eww open bar_widget")
+hl.exec_cmd("eww update get_vol=$(pamixer --get-volume)")
+hl.exec_cmd("~/.config/eww/scripts/getvol.sh")
+hl.exec_cmd("~/.config/hypr/scripts/set-eww-vars.sh")
 hl.exec_cmd("~/.config/eww/scripts/workspace.sh")
 hl.exec_cmd("hyprpaper &")
 hl.exec_cmd("hypridle")
@@ -191,12 +194,6 @@ hl.config({
     },
 })
 
-hl.gesture({
-    fingers = 3,
-    direction = "horizontal",
-    action = "workspace"
-})
-
 -- Example per-device config
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Devices/ for more
 hl.device({
@@ -212,13 +209,14 @@ hl.device({
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + W", hl.dsp.window.float({ action = "toggle" }))
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("grim -g \"$(slurp)\" ~/Pictures/Screenshots/screenshot.jpg"))
 local closeWindowBind = hl.bind(mainMod .. " + E", hl.dsp.window.close())
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("kitty ranger"))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("hyprctl switchxkblayout at-translated-set-2-keyboard next"))
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("~/.config/hypr/scripts/kb-switch.sh next"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 

@@ -41,6 +41,7 @@
 )
 
 (defvar trayrev false)
+(defvar username "")
 
 (defwidget tray []
     (box :orientation "h"
@@ -85,6 +86,10 @@
     )
 )
 
+(defpoll batcap :interval "5s" :initial "0"
+    "cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1 | grep . || echo 0"
+)
+
 (defwidget battery []
     (box :class "battery"
         (box :orientation "h"
@@ -92,8 +97,8 @@
                        (box :class "batico-short"
                             (literal :content batico)
                        )
-                       (label :class "bsht" 
-                              :text "${EWW_BATTERY.BAT0.capacity}%")
+                       (label :class "bsht"
+                              :text "${batcap}%")
                   )
     )
 )
@@ -206,7 +211,7 @@
                                             :class "wifi-bcon"
                                             (eventbox :cursor "pointer"
                                                       :class "wifi-buttons"
-                                                      :onclick "/usr/bin/eww update wificonfigrev=false && nmcli device disconnect wlp0s20f3"
+                                                      :onclick "/usr/bin/eww update wificonfigrev=false && ./scripts/wifi-disconnect.sh"
                                                       :height 30
                                                       (label :text "Disconnect")
                                             )
@@ -252,7 +257,7 @@
                         :x "5px"
                         :y "-14px"
                         :width "425px"
-                        :height "440px"
+                        :height "40.7%"
     )
     (expander :expanded true
               (revealer :transition "slidedown"
@@ -272,7 +277,7 @@
     (box :class "keyboard"
         (eventbox :onhover "./scripts/kb-delay.sh"
                   :onhoverlost "bash -c '/usr/bin/eww update keyrev=false && /usr/bin/eww update keyhov=false'"
-                  :onclick "hyprctl switchxkblayout at-translated-set-2-keyboard next"
+                  :onclick "~/.config/hypr/scripts/kb-switch.sh next"
                   :cursor "pointer"
                   (box :orientation "h"
                        :space-evenly false
@@ -319,7 +324,7 @@
                         :x "5px"
                         :y "-4px"
                         :width "425px"
-                        :height "993px")
+                        :height "91.9%")
     (box :space-evenly false
          (revealer :transition "slideright"
                    :reveal menurev
@@ -476,7 +481,7 @@
                         :x "5px"
                         :y "-4px"
                         :width "425px"
-                        :height "993px"
+                        :height "91.9%"
     )
     (box :space-evenly false
          :halign "end"
@@ -513,7 +518,7 @@
                              :space-evenly false
                              (box :class "username"
                                   :space-evenly false
-                                  (label :text "Monasm")
+                                  (label :text username)
                              )
                              (box :class "uptime"
                                   :space-evenly false
@@ -575,7 +580,7 @@
                                   :orientation "v"
                                   (box :class "bat-percent"
                                        :space-evenly false
-                                       (label :text "Battery ${EWW_BATTERY.BAT0.capacity}%")
+                                       (label :text "Battery ${batcap}%")
                                   )
                                   (box :class "bat-status"
                                        :space-evenly false
@@ -713,6 +718,10 @@
     "./scripts/getvol.sh"
 )
 
+(defpoll coretemp :interval "2s" :initial "{\"package\":0,\"cores\":[]}"
+    "./scripts/coretemp.sh"
+)
+
 (defwidget cpu-panel []
     (box :class "cpu-container"
          :orientation "v"
@@ -734,25 +743,22 @@
                      :time-range "300s"
                      :min 0
                      :max 101
-                     :value {EWW_TEMPS.CORETEMP_PACKAGE_ID_0}
+                     :value {coretemp.package}
               )
               (box :class "main-temp"
                    :halign "start"
                    :valign "end"
-                   (label :class "main-temp-text" :text "${EWW_TEMPS.CORETEMP_PACKAGE_ID_0} °C")
+                   (label :class "main-temp-text" :text "${coretemp.package} °C")
               )
               )
          )
          (box :class "minicore-container"
               :orientation "v"
               :space-evenly false
-              (box :class "minicores"
-                   (label :class "C0" :text "Core 0: ${EWW_TEMPS.CORETEMP_CORE_0} °C")
-                   (label :class "C1" :text "Core 1: ${EWW_TEMPS.CORETEMP_CORE_1} °C")
-              )
-              (box :class "minicores"
-                   (label :class "C2" :text "Core 2: ${EWW_TEMPS.CORETEMP_CORE_2} °C")
-                   (label :class "C3" :text "Core 3: ${EWW_TEMPS.CORETEMP_CORE_3} °C")
+              (for c in {coretemp.cores}
+                   (box :class "minicores"
+                        (label :class "core-mini" :text "${c.label}: ${c.temp} °C")
+                   )
               )
          )
 

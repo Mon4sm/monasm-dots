@@ -25,9 +25,16 @@ get_icon(){
   esac
 }
 
+BAT=$(for b in /sys/class/power_supply/BAT*; do [ -e "$b/capacity" ] && echo "$b" && break; done)
+
 while true; do
-    BATTERY=$(cat /sys/class/power_supply/BAT0/capacity)
-    STATUS=$(cat /sys/class/power_supply/BAT0/status)
+    if [ -z "$BAT" ]; then
+        echo "(box)"
+        sleep 5
+        continue
+    fi
+    BATTERY=$(cat "$BAT/capacity")
+    STATUS=$(cat "$BAT/status")
     CLASS=""
     ICON=""
     get_icon "$BATTERY"
