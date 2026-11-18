@@ -27,7 +27,7 @@ ws(){
     output="(box :class \"ws\" :halign \"end\" :orientation \"h\" :spacing 5 :space-evenly \"false\""
     for i in {1..6}; do
         idx=$((i-1))
-        output+=" (eventbox :onclick \"hyprctl dispatch workspace $i\" :cursor \"pointer\" :class \"${workspace_class[$idx]}\" (label :text \"${workspace_icon[$idx]}\"))"
+        output+=" (eventbox :onclick \"hyprctl dispatch 'workspace($i)'\" :cursor \"pointer\" :class \"${workspace_class[$idx]}\" (label :text \"${workspace_icon[$idx]}\"))"
     done
     output+=")"
     /usr/bin/eww update workspaces-output="$output"

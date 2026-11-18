@@ -2,7 +2,7 @@
 --- MONITORS ---
 ----------------
 
-hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto", })
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1, })
 hl.config({ ecosystem = { no_update_news = true } })
 
 -------------------
@@ -18,7 +18,6 @@ local vol = "pamixer --get-volume"
 
 hl.on("hyprland.start", function () 
 hl.exec_cmd("eww open bar_widget")
-hl.exec_cmd("eww update get_vol=$(pamixer --get-volume)")
 hl.exec_cmd("~/.config/eww/scripts/getvol.sh")
 hl.exec_cmd("~/.config/hypr/scripts/set-eww-vars.sh")
 hl.exec_cmd("~/.config/eww/scripts/workspace.sh")

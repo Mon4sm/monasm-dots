@@ -11,9 +11,9 @@
 char git_path[] = "https://github.com/Mon4sm/monasm-dots";
 char *dependency[] = {"awk","basename","bash","brightnessctl","cat","cp","curl","cut","date","echo","eww","fastfetch","fc-cache","fc-list","git","grep","grim","head","hyprctl","hypridle","hyprland","hyprlock","hyprpaper","jq","kitty","loginctl","ls","mkdir","mv","nmcli","nvim","pamixer","pidof","playerctl","ranger","rm","sh","sleep","slurp","socat","stdbuf","systemctl","uptime","wget","wpctl","xargs"};
 char *font_dependency[] = {"JetBrainsMono Nerd Font"};
-char *exe_file[] = {"batest.sh","getvol.sh","menu.sh","wifictl.sh","batico.sh","current-wifi.sh","kb-delay.sh","music.sh","wifi-delay.sh","battery.sh","get_kb.sh","lock.sh","pmusic.sh","workspace.sh","calendar.sh","getnet.sh","menuctl.sh","usrctl.sh","wifi-disconnect.sh","coretemp.sh"};
-char *hypr_file[] = {"/delay-exec.sh","/battery.sh","/kb-switch.sh","/set-eww-vars.sh","/text_animation/anitext.sh","/weather/weather.sh"};
-char *hypr_name[] = {"delay-exec.sh","battery.sh","kb-switch.sh","set-eww-vars.sh","anitext.sh","weather.sh"};
+char *exe_file[] = {"batest.sh","getvol.sh","menu.sh","wifictl.sh","batico.sh","current-wifi.sh","kb-delay.sh","music.sh","wifi-delay.sh","get_kb.sh","lock.sh","pmusic.sh","workspace.sh","calendar.sh","getnet.sh","menuctl.sh","usrctl.sh","wifi-disconnect.sh","coretemp.sh"};
+char *hypr_file[] = {"/battery.sh","/kb-switch.sh","/set-eww-vars.sh","/text_animation/anitext.sh","/weather/weather.sh"};
+char *hypr_name[] = {"battery.sh","kb-switch.sh","set-eww-vars.sh","anitext.sh","weather.sh"};
 
 void boot(){
     printf("\033[93mStarting monasm-dots installation script");
@@ -37,7 +37,7 @@ void dependencies(){
         pipe = popen(cmd,"r");
         printf("Finding Dependency: %s\n",dependency[i]);
         usleep(100000);
-        if(fgets(path,sizeof(path),pipe)!=NULL){
+        if(pipe!=NULL && fgets(path,sizeof(path),pipe)!=NULL){
             path[strcspn(path,"\n")]=0;
             printf("    \033[92mFound: %s at %s\033[0m\n",dependency[i],path);
         }
@@ -46,11 +46,12 @@ void dependencies(){
             printf("    \033[31mMissing dependency: %s\033[0m\n",dependency[i]);
             cnt++;
         }
-        pclose(pipe);
+        if(pipe!=NULL){
+            pclose(pipe);
+        }
     }
     for(int i=0;i<size(font_dependency);i++){
         char cmd[256];
-        FILE *pipe;
         snprintf(cmd,sizeof(cmd),"fc-list | grep -qi \"%s\"",font_dependency[i]);
         printf("Finding Dependency: %s\n",font_dependency[i]);
         usleep(100000);
@@ -86,11 +87,14 @@ void clone(){
 }
 
 void warning(){
-    char c;
+    char c=0;
     printf("\033[93mWARNING!!! The next procedure will overwrite **crucial Hyprland configuration files**.\nTo see which folders will be replaced, check out this repository:\n	%s\nAll the folders in the .config folder of this repository will be replacing all folders in your ~/.config directory. Before continuing, make sure to save any important files!\n\033[0m",git_path);
     while(!(c=='Y'||c=='y'||c=='N'||c=='n')){
         printf("\033[93mDo you wish to proceed (Y/N): \033[0m");
-        scanf(" %c",&c);
+        if(scanf(" %c",&c)!=1){
+            printf("\033[31m\nNo input received. Ending process...\033[0m\n");
+            exit(EXIT_FAILURE);
+        }
         if((c=='Y'||c=='y'||c=='N'||c=='n')){
             break;
         }

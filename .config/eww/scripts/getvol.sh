@@ -1,5 +1,9 @@
 #!/bin/bash
 
+while ! /usr/bin/eww ping >/dev/null 2>&1; do
+    sleep 0.1
+done
+
 vol=$(pamixer --get-volume)
 mute=$(pamixer --get-mute)
 if [ "$mute" = true ]; then

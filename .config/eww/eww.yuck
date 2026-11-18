@@ -714,9 +714,6 @@
 )
 
 (defvar get_vol "")
-(deflisten get_volume
-    "./scripts/getvol.sh"
-)
 
 (defpoll coretemp :interval "2s" :initial "{\"package\":0,\"cores\":[]}"
     "./scripts/coretemp.sh"
