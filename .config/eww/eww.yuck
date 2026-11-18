@@ -1,6 +1,7 @@
 (defwidget bar []
     (box :class "bar"
          :orientation "h"
+         :hexpand true
          (box :halign "start"
               :valign "center"
               :spacing 10
